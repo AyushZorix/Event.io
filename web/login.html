@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Event.io — Welcome</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: url('bg.jpg') center/cover no-repeat fixed;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* dark overlay so card pops */
+    html::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 10, 5, 0.50);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      width: 100%; max-width: 460px;
+      background: #fffaf5; border-radius: 22px;
+      overflow: hidden; box-shadow: 0 32px 100px rgba(0,0,0,.60);
+    }
+
+    /* FORM PANEL */
+    .right { padding: 44px 48px 36px; display: flex; flex-direction: column; background: #fffaf5; }
+
+    .form-area { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+
+    .tabs { display: flex; border-bottom: 2px solid #e8ddd4; margin-bottom: 20px; }
+    .tab { flex: 1; text-align: center; padding: 9px 0; font-size: .88rem; font-weight: 700; color: #a8998e; cursor: pointer; border: none; background: none; border-bottom: 2.5px solid transparent; margin-bottom: -2px; transition: color .15s, border-color .15s; font-family: inherit; }
+    .tab.active { color: #c2410c; border-bottom-color: #c2410c; }
+    .tab:hover:not(.active) { color: #292524; }
+
+    .welcome { font-size: 2.4rem; font-weight: 900; color: #1c1917; letter-spacing: -.5px; line-height: 1; margin-bottom: 4px; }
+    .welcome-sub { font-size: .82rem; color: #78716c; margin-bottom: 22px; }
+
+    .msg { border-radius: 8px; padding: 9px 13px; font-size: .81rem; font-weight: 500; margin-bottom: 12px; display: none; }
+    .msg.error   { background: #fee2e2; color: #dc2626; display: block; }
+    .msg.success { background: #dcfce7; color: #15803d; display: block; }
+
+    .field-label { display: flex; justify-content: space-between; align-items: center; font-size: .7rem; font-weight: 700; color: #44403c; letter-spacing: .4px; margin-bottom: 5px; }
+    .forgot { font-size: .73rem; color: #c2410c; font-weight: 600; text-decoration: none; }
+    .forgot:hover { text-decoration: underline; }
+
+    .input-wrap { position: relative; margin-bottom: 14px; }
+    .input-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: #a8998e; pointer-events: none; display: flex; align-items: center; }
+    .input-wrap input { width: 100%; padding: 11px 14px 11px 40px; border: 1.8px solid #e0d5cc; border-radius: 10px; font-size: .9rem; color: #1c1917; background: #fdf8f3; font-family: inherit; transition: border-color .15s, background .15s; }
+    .input-wrap input::placeholder { color: #c4b5a8; font-size: .88rem; }
+    .input-wrap input:focus { outline: none; border-color: #c2410c; background: #fff; }
+
+    #nameWrap { display: none; }
+
+    .btn-login { width: 100%; padding: 12px; background: #c2410c; color: #fff; border: none; border-radius: 10px; font-size: .88rem; font-weight: 800; letter-spacing: 1.8px; text-transform: uppercase; cursor: pointer; margin-top: 4px; transition: background .15s, transform .1s; font-family: inherit; }
+    .btn-login:hover  { background: #9a3412; }
+    .btn-login:active { transform: scale(.985); }
+    .btn-login:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+    .switch-link { text-align: center; font-size: .8rem; color: #78716c; margin-top: 14px; }
+    .switch-link a { color: #c2410c; font-weight: 700; cursor: pointer; text-decoration: none; }
+    .switch-link a:hover { text-decoration: underline; }
+
+    @media (max-width: 520px) {
+      .right { padding: 36px 28px 28px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+
+  <!-- FORM PANEL -->
+  <div class="right">
+    <div class="form-area">
+
+      <!-- Brand logo -->
+      <div style="text-align:center;margin-bottom:22px;">
+        <span style="font-size:1.7rem;font-weight:900;letter-spacing:-1px;color:#c2410c;">Event<span style="color:#1c1917;">.io</span></span>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" id="tabLogin"  onclick="switchMode('login')"> Login</button>
+        <button class="tab"        id="tabSignup" onclick="switchMode('signup')">Signup</button>
+      </div>
+
+      <div class="welcome" id="heading">Welcome</div>
+      <div class="welcome-sub" id="subheading">Sign in to Event.io</div>
+
+      <div class="msg" id="msgBox"></div>
+
+      <form id="authForm" onsubmit="handleSubmit(event)" novalidate>
+
+        <div id="nameWrap">
+          <div class="field-label">FULL NAME</div>
+          <div class="input-wrap">
+            <span class="input-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </span>
+            <input type="text" id="nameInput" placeholder="Ayush Bhandari" />
+          </div>
+        </div>
+
+        <div class="field-label">EMAIL ID</div>
+        <div class="input-wrap">
+          <span class="input-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          </span>
+          <input type="email" id="emailInput" placeholder="a@example.com" required />
+        </div>
+
+        <div class="field-label">
+          PASSWORD
+          <a class="forgot" href="#" id="forgotLink" onclick="handleForgot(event)">Forgot your password?</a>
+        </div>
+        <div class="input-wrap">
+          <span class="input-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </span>
+          <input type="password" id="passInput" placeholder="••••••••" required />
+        </div>
+
+        <button type="submit" class="btn-login" id="submitBtn">LOGIN</button>
+      </form>
+
+      <p class="switch-link" id="switchText">
+        Don't have account? <a onclick="switchMode('signup')">Signup</a>
+      </p>
+
+    </div>
+  </div>
+</div>
+
+<div id="toastWrap" style="position:fixed;bottom:24px;right:24px;z-index:999;display:flex;flex-direction:column;gap:10px;"></div>
+
+<script>
+var mode = 'login';
+
+function switchMode(m) {
+  mode = m;
+  document.getElementById('tabLogin').classList.toggle('active',  m === 'login');
+  document.getElementById('tabSignup').classList.toggle('active', m === 'signup');
+  document.getElementById('nameWrap').style.display    = m === 'signup' ? 'block' : 'none';
+  document.getElementById('heading').textContent       = m === 'login' ? 'Welcome' : 'Create Account';
+  document.getElementById('subheading').textContent    = m === 'login' ? 'Sign in to Event.io' : 'Create your Event.io account';
+  document.getElementById('submitBtn').textContent     = m === 'login' ? 'LOGIN' : 'REGISTER';
+  document.getElementById('forgotLink').style.display  = m === 'login' ? '' : 'none';
+  document.getElementById('switchText').innerHTML      = m === 'login'
+    ? "Don't have account? <a onclick=\"switchMode('signup')\">Register Now</a>"
+    : "Already have account? <a onclick=\"switchMode('login')\">Login</a>";
+  clearMsg();
+  document.getElementById('authForm').reset();
+}
+
+function handleSubmit(e) {
+  e.preventDefault();
+  clearMsg();
+  var email = document.getElementById('emailInput').value.trim();
+  var pass  = document.getElementById('passInput').value;
+  var name  = document.getElementById('nameInput').value.trim();
+  if (!email || !pass)            { showMsg('Please fill in all fields.', 'error'); return; }
+  if (pass.length < 8)            { showMsg('Password must be at least 8 characters.', 'error'); return; }
+  if (mode === 'signup' && !name) { showMsg('Please enter your full name.', 'error'); return; }
+  if (mode === 'signup') { doSignup(name, email, pass); } else { doLogin(email, pass); }
+}
+
+function doSignup(name, email, pass) {
+  setLoading(true);
+  fetch('/api/users', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: name, email: email, password: pass })
+  })
+  .then(function(res) {
+    return res.text().then(function(t) { return { ok: res.ok, text: t }; });
+  })
+  .then(function(r) {
+    var user = null;
+    try { user = JSON.parse(r.text); } catch(e) {}
+    if (!r.ok) { showMsg((user ? JSON.stringify(user) : r.text) || 'Sign up failed.', 'error'); setLoading(false); return; }
+    // store API user + password locally
+    var toStore = user || { name: name, email: email };
+    toStore.password = pass;
+    localStorage.setItem('eventhub_user', JSON.stringify(toStore));
+    showMsg('Welcome ' + toStore.name + '! Redirecting...', 'success');
+    setTimeout(function() { window.location.href = '/'; }, 1300);
+  })
+  .catch(function(err) { showMsg('Network error: ' + err.message, 'error'); setLoading(false); });
+}
+
+function doLogin(email, pass) {
+  setLoading(true);
+  fetch('/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email, password: pass })
+  })
+  .then(function(res) {
+    return res.text().then(function(t) { return { ok: res.ok, status: res.status, text: t }; });
+  })
+  .then(function(r) {
+    if (!r.ok) {
+      var msg = r.status === 401 ? 'Incorrect email or password.' : (r.text || 'Login failed.');
+      showMsg(msg, 'error'); setLoading(false); return;
+    }
+    var user = JSON.parse(r.text);
+    localStorage.setItem('eventhub_user', JSON.stringify(user));
+    showMsg('Welcome back, ' + user.name + '! Redirecting...', 'success');
+    setTimeout(function() { window.location.href = '/'; }, 1100);
+  })
+  .catch(function(err) { showMsg('Network error: ' + err.message, 'error'); setLoading(false); });
+}
+
+function handleForgot(e) {
+  e.preventDefault();
+  var email = document.getElementById('emailInput').value.trim();
+  if (!email) { showMsg('Enter your email above first.', 'error'); return; }
+  showMsg('Password reset would be sent to ' + email + ' (demo only).', 'success');
+}
+
+function socialToast(p) { toast(p + ' auth is a demo stub.'); }
+
+function showMsg(t, type) {
+  var b = document.getElementById('msgBox');
+  b.textContent = t; b.className = 'msg ' + type;
+}
+function clearMsg() {
+  var b = document.getElementById('msgBox');
+  b.className = 'msg'; b.textContent = '';
+}
+function setLoading(on) {
+  var btn = document.getElementById('submitBtn');
+  btn.disabled = on;
+  btn.textContent = on ? '...' : (mode === 'login' ? 'LOGIN' : 'REGISTER');
+}
+function toast(msg) {
+  var el = document.createElement('div');
+  el.style.cssText = 'padding:11px 16px;border-radius:8px;background:#c2410c;color:#fff;font-size:.85rem;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.2);max-width:280px;';
+  el.textContent = msg;
+  document.getElementById('toastWrap').appendChild(el);
+  setTimeout(function() { el.remove(); }, 3000);
+}
+</script>
+</body>
+</html>

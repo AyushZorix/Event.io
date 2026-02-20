@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Event.io — Event Registration &amp; Ticketing</title>
+  <style>
+    /* ── Reset & Variables ──────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brand:      #f05537;
+      --brand-dark: #c73c20;
+      --bg:         #f7f7f7;
+      --surface:    #ffffff;
+      --border:     #e2e2e2;
+      --text:       #1a1a1a;
+      --muted:      #6b7280;
+      --success:    #16a34a;
+      --danger:     #dc2626;
+      --warn:       #d97706;
+      --radius:     10px;
+      --shadow:     0 2px 12px rgba(0,0,0,.08);
+      --transition: .18s ease;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ─────────────────────────────────────────────────── */
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: #1a1a1a;
+      box-shadow: 0 2px 8px rgba(0,0,0,.3);
+    }
+    .header-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px; height: 60px;
+    }
+    .logo {
+      font-size: 1.35rem; font-weight: 800; color: var(--brand);
+      letter-spacing: -.5px; cursor: pointer; text-decoration: none;
+    }
+    .logo span { color: #fff; }
+    nav { display: flex; gap: 4px; }
+    .nav-btn {
+      background: none; border: none; cursor: pointer;
+      color: #ccc; padding: 8px 16px; border-radius: 6px;
+      font-size: .9rem; transition: var(--transition);
+    }
+    .nav-btn:hover { background: rgba(255,255,255,.08); color: #fff; }
+    .nav-btn.active { background: var(--brand); color: #fff; font-weight: 600; }
+    .btn-host-hero {
+      margin-top: 18px;
+      background: var(--brand); color: #fff;
+      border: none; border-radius: 8px;
+      padding: 11px 26px; font-size: .95rem; font-weight: 700;
+      cursor: pointer; font-family: inherit;
+      transition: background var(--transition);
+    }
+    .btn-host-hero:hover { background: var(--brand-dark); }
+    .header-actions { display: flex; align-items: center; gap: 12px; }
+    #userBadge {
+      font-size: .82rem; color: #aaa;
+      background: rgba(255,255,255,.08);
+      padding: 5px 12px; border-radius: 20px;
+    }
+    #userBadge span { color: var(--brand); font-weight: 600; }
+
+    /* ── Layout ─────────────────────────────────────────────────── */
+    main { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ── Section titles ──────────────────────────────────────────── */
+    .section-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .section-head h1 { font-size: 1.6rem; font-weight: 700; }
+    .section-head p { color: var(--muted); font-size: .9rem; margin-top: 3px; }
+
+    /* ── Buttons ─────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 20px; border-radius: 8px; font-size: .9rem;
+      font-weight: 600; cursor: pointer; border: none;
+      transition: var(--transition); text-decoration: none;
+    }
+    .btn-primary { background: var(--brand); color: #fff; }
+    .btn-primary:hover { background: var(--brand-dark); }
+    .btn-secondary { background: #fff; color: var(--text); border: 1.5px solid var(--border); }
+    .btn-secondary:hover { border-color: #aaa; }
+    .btn-sm { padding: 6px 14px; font-size: .82rem; }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* ── Event Cards Grid ────────────────────────────────────────── */
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .event-card {
+      background: var(--surface); border-radius: var(--radius);
+      box-shadow: var(--shadow); border: 1px solid var(--border);
+      overflow: hidden; transition: transform var(--transition), box-shadow var(--transition);
+      cursor: pointer;
+    }
+    .event-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.12); }
+    .event-card-banner {
+      height: 160px;
+      background: linear-gradient(135deg, var(--brand) 0%, #7c3aed 100%);
+      display: flex; align-items: flex-end; padding: 12px 16px;
+      position: relative; overflow: hidden;
+    }
+    .event-card-banner img {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      transition: transform .4s ease;
+    }
+    .event-card:hover .event-card-banner img { transform: scale(1.05); }
+    .event-card-banner-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,.55) 0%, rgba(0,0,0,.1) 100%);
+    }
+    .event-card-banner.alt1 { background: linear-gradient(135deg, #0ea5e9 0%, #7c3aed 100%); }
+    .event-card-banner.alt2 { background: linear-gradient(135deg, #10b981 0%, #0ea5e9 100%); }
+    .event-card-banner.alt3 { background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); }
+    .event-card-banner.alt4 { background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%); }
+    .event-card-date {
+      position: relative; z-index: 1;
+      background: rgba(0,0,0,.45); color: #fff;
+      padding: 4px 10px; border-radius: 5px; font-size: .75rem; font-weight: 600;
+      backdrop-filter: blur(4px);
+    }
+    .event-card-body { padding: 16px; }
+    .event-card-title { font-size: 1rem; font-weight: 700; margin-bottom: 6px; line-height: 1.3; }
+    .event-card-desc { font-size: .82rem; color: var(--muted); margin-bottom: 12px; line-height: 1.45;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .capacity-bar-wrap { margin-bottom: 14px; }
+    .capacity-label {
+      display: flex; justify-content: space-between;
+      font-size: .76rem; color: var(--muted); margin-bottom: 5px;
+    }
+    .capacity-bar {
+      height: 6px; background: var(--border); border-radius: 99px; overflow: hidden;
+    }
+    .capacity-bar-fill {
+      height: 100%; border-radius: 99px; transition: width .4s ease;
+      background: var(--success);
+    }
+    .capacity-bar-fill.warn { background: var(--warn); }
+    .capacity-bar-fill.full { background: var(--danger); }
+    .badge {
+      display: inline-block; padding: 3px 9px; border-radius: 99px;
+      font-size: .72rem; font-weight: 700; letter-spacing: .3px;
+    }
+    .badge-green  { background: #dcfce7; color: var(--success); }
+    .badge-red    { background: #fee2e2; color: var(--danger); }
+    .badge-yellow { background: #fef9c3; color: var(--warn); }
+    .badge-gray   { background: #f3f4f6; color: var(--muted); }
+
+    /* ── Empty / Loading states ──────────────────────────────────── */
+    .empty-state {
+      text-align: center; padding: 80px 20px; color: var(--muted);
+    }
+    .empty-state .icon { font-size: 3.5rem; margin-bottom: 16px; }
+    .empty-state h3 { font-size: 1.1rem; margin-bottom: 8px; color: var(--text); }
+    .empty-state p { font-size: .88rem; }
+    .spinner {
+      border: 3px solid var(--border); border-top-color: var(--brand);
+      border-radius: 50%; width: 36px; height: 36px;
+      animation: spin .7s linear infinite;
+      margin: 60px auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Search / filter bar ─────────────────────────────────────── */
+    .search-bar {
+      display: flex; gap: 10px; margin-bottom: 24px;
+    }
+    .search-bar input {
+      flex: 1; padding: 10px 14px; border: 1.5px solid var(--border);
+      border-radius: 8px; font-size: .9rem; background: var(--surface);
+      transition: border-color var(--transition);
+    }
+    .search-bar input:focus { outline: none; border-color: var(--brand); }
+
+    /* ── Forms ───────────────────────────────────────────────────── */
+    .form-card {
+      background: var(--surface); border-radius: var(--radius);
+      box-shadow: var(--shadow); border: 1px solid var(--border);
+      padding: 32px; max-width: 640px;
+    }
+    .form-card h2 { font-size: 1.2rem; font-weight: 700; margin-bottom: 24px; }
+    .form-group { margin-bottom: 18px; }
+    .form-group label {
+      display: block; font-size: .82rem; font-weight: 600;
+      margin-bottom: 6px; color: var(--text);
+    }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%; padding: 10px 13px;
+      border: 1.5px solid var(--border); border-radius: 8px;
+      font-size: .9rem; font-family: inherit;
+      transition: border-color var(--transition);
+      background: var(--bg);
+    }
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus { outline: none; border-color: var(--brand); background: #fff; }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-hint { font-size: .75rem; color: var(--muted); margin-top: 4px; }
+
+    /* ── Modal ───────────────────────────────────────────────────── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.55); z-index: 200;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--surface); border-radius: var(--radius);
+      box-shadow: 0 20px 60px rgba(0,0,0,.25);
+      width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto;
+    }
+    .modal-cover {
+      width: 100%; height: 200px; object-fit: cover;
+      display: block; border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .modal-badges {
+      display: flex; gap: 8px; flex-wrap: wrap;
+      padding: 12px 24px 0;
+    }
+    .modal-badge {
+      font-size: .75rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+      padding: 4px 12px; border-radius: 20px;
+      background: rgba(240,85,55,.15); color: var(--brand); border: 1px solid rgba(240,85,55,.3);
+    }
+    .modal-badge.city {
+      background: rgba(255,255,255,.06); color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .modal-badge.price {
+      background: rgba(74,222,128,.15); color: #4ade80;
+      border: 1px solid rgba(74,222,128,.3);
+    }
+    .modal-badge.free {
+      background: rgba(156,163,175,.1); color: #9ca3af;
+      border: 1px solid rgba(156,163,175,.2);
+    }
+    .modal-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: flex-start; justify-content: space-between;
+    }
+    .modal-header h2 { font-size: 1.15rem; font-weight: 700; line-height: 1.3; flex: 1; }
+    .modal-close {
+      background: none; border: none; cursor: pointer;
+      font-size: 1.4rem; color: var(--muted); padding: 0 0 0 12px;
+      line-height: 1; transition: color var(--transition);
+    }
+    .modal-close:hover { color: var(--text); }
+    .modal-body { padding: 20px 24px; }
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: flex-end; gap: 10px;
+    }
+    .modal-meta { display: grid; gap: 10px; margin-bottom: 20px; }
+    .modal-meta-row {
+      display: flex; gap: 10px; font-size: .85rem;
+    }
+    .modal-meta-row .key { width: 110px; color: var(--muted); flex-shrink: 0; font-weight: 600; }
+    .modal-meta-row .val { color: var(--text); }
+
+    /* ── Toast ───────────────────────────────────────────────────── */
+    #toastContainer {
+      position: fixed; bottom: 24px; right: 24px;
+      z-index: 500; display: flex; flex-direction: column; gap: 10px;
+    }
+    .toast {
+      padding: 12px 18px; border-radius: 8px;
+      font-size: .88rem; font-weight: 500; color: #fff;
+      box-shadow: 0 4px 16px rgba(0,0,0,.2);
+      animation: slideIn .25s ease forwards;
+      max-width: 320px;
+    }
+    .toast.success { background: var(--success); }
+    .toast.error   { background: var(--danger); }
+    .toast.info    { background: #3b82f6; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(30px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ── Account page ────────────────────────────────────────────── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 720px) { .two-col { grid-template-columns: 1fr; } }
+    .reg-item {
+      border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px;
+      margin-bottom: 10px; background: var(--surface);
+    }
+    .reg-item .event-name { font-weight: 600; font-size: .9rem; }
+    .reg-item .reg-date { font-size: .78rem; color: var(--muted); margin-top: 3px; }
+
+    /* ── Registrations detail ────────────────────────────────────── */
+    .reg-user-list { display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow-y: auto; }
+    .reg-user-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 8px; background: var(--bg);
+      font-size: .85rem;
+    }
+    .avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--brand), #7c3aed);
+      color: #fff; font-weight: 700; font-size: .75rem;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* ── Hero banner ─────────────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d1f3d 100%);
+      border-radius: var(--radius); padding: 40px 40px; margin-bottom: 32px;
+      color: #fff; position: relative; overflow: hidden;
+    }
+    .hero::after {
+      content: '🎟';
+      position: absolute; right: 32px; top: 50%; transform: translateY(-50%);
+      font-size: 5rem; opacity: .25;
+    }
+    .hero h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; }
+    .hero p { color: rgba(255,255,255,.65); font-size: .95rem; max-width: 480px; }
+    .hero .hero-actions { display: flex; gap: 12px; margin-top: 20px; }
+
+    /* ── Stats strip ─────────────────────────────────────────────── */
+    .stats-strip {
+      display: flex; gap: 16px; margin-bottom: 28px; flex-wrap: wrap;
+    }
+    .stat-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 16px 24px;
+      flex: 1; min-width: 130px;
+    }
+    .stat-box .num { font-size: 1.6rem; font-weight: 800; color: var(--brand); }
+    .stat-box .lbl { font-size: .78rem; color: var(--muted); margin-top: 2px; }
+
+    /* ── Category bar ───────────────────────────────────────────── */
+    .cat-bar {
+      background: #111;
+      border-bottom: 1px solid #2a2a2a;
+      position: sticky; top: 60px; z-index: 99;
+    }
+    .cat-bar-inner {
+      max-width: 1200px; margin: 0 auto;
+      padding: 0 24px;
+      display: flex; gap: 4px;
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .cat-bar-inner::-webkit-scrollbar { display: none; }
+    .cat-pill {
+      display: flex; align-items: center; gap: 6px;
+      padding: 10px 18px; white-space: nowrap;
+      font-size: .82rem; font-weight: 600; color: #aaa;
+      border: none; background: none; cursor: pointer;
+      border-bottom: 2.5px solid transparent;
+      transition: color .15s, border-color .15s;
+      font-family: inherit;
+    }
+    .cat-pill:hover { color: #fff; }
+    .cat-pill.active { color: var(--brand); border-bottom-color: var(--brand); }
+
+    /* ── Create event centered layout ─────────────────────────── */
+    .create-wrap {
+      display: flex; justify-content: center;
+      padding: 40px 24px;
+    }
+    .create-card {
+      width: 100%; max-width: 620px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 36px 40px;
+    }
+    .create-header { margin-bottom: 28px; }
+    .create-header h1 { font-size: 1.6rem; font-weight: 800; margin-bottom: 6px; }
+    .create-header p { color: var(--muted); font-size: .92rem; }
+    .create-card select {
+      width: 100%; padding: 10px 14px;
+      background: var(--bg); color: var(--text);
+      border: 1.5px solid var(--border); border-radius: 8px;
+      font-size: .92rem; font-family: inherit;
+      appearance: none; cursor: pointer;
+    }
+    .create-card select:focus { outline: none; border-color: var(--brand); }
+    .cover-upload-area {
+      border: 2px dashed var(--border); border-radius: 10px;
+      height: 160px; cursor: pointer; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; transition: border-color .2s;
+      background: var(--bg);
+    }
+    .cover-upload-area:hover { border-color: var(--brand); }
+    .cover-upload-area img {
+      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+    }
+    .cover-upload-placeholder {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      color: var(--muted); font-size: .85rem; pointer-events: none;
+    }
+    .cover-clear-btn {
+      margin-top: 8px; background: none; border: none;
+      color: #f87171; font-size: .82rem; cursor: pointer; padding: 0;
+      font-family: inherit;
+    }
+    .cover-clear-btn:hover { text-decoration: underline; }
+
+    /* ── City search page ──────────────────────────────────────── */
+    .city-hero { text-align: center; padding: 40px 0 28px; }
+    .city-hero h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; }
+    .city-hero p { color: var(--muted); font-size: .95rem; }
+    .city-search-wrap {
+      max-width: 600px; margin: 0 auto 36px;
+      display: flex; gap: 10px;
+    }
+    .city-search-wrap input {
+      flex: 1; padding: 13px 18px; border-radius: 8px;
+      border: 1.5px solid var(--border); background: var(--card);
+      color: var(--text); font-size: 1rem; font-family: inherit;
+    }
+    .city-search-wrap input:focus { outline: none; border-color: var(--brand); }
+    #cityResults { margin-top: 0; }
+    #cityEmpty { display: none; }
+
+    /* ── Support / FAQ ──────────────────────────────────────────── */
+    .support-hero { text-align: center; padding: 40px 0 32px; }
+    .support-hero h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; }
+    .support-hero p { color: var(--muted); font-size: .95rem; }
+    .faq-list { max-width: 720px; margin: 0 auto 36px; }
+    .faq-item { border-bottom: 1px solid var(--border); }
+    .faq-q {
+      width: 100%; text-align: left; background: none; border: none;
+      padding: 18px 4px; font-size: .97rem; font-weight: 600; color: var(--text);
+      cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+      gap: 12px; font-family: inherit; transition: color .15s;
+    }
+    .faq-q:hover { color: var(--brand); }
+    .faq-q .faq-icon { font-size: .75rem; color: var(--muted); transition: transform .2s; }
+    .faq-q.open .faq-icon { transform: rotate(180deg); color: var(--brand); }
+    .faq-a {
+      display: none; padding: 0 4px 16px;
+      font-size: .91rem; color: var(--muted); line-height: 1.75;
+    }
+    .faq-a.open { display: block; }
+    .support-contact {
+      max-width: 720px; margin: 0 auto;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 28px 32px;
+      display: flex; gap: 36px; flex-wrap: wrap;
+    }
+    .support-contact-item { display: flex; gap: 14px; align-items: flex-start; }
+    .support-contact-icon { font-size: 1.5rem; margin-top: 2px; }
+    .support-contact-label { font-size: .78rem; color: var(--muted); margin-bottom: 3px; text-transform: uppercase; letter-spacing: .05em; }
+    .support-contact-value { font-weight: 600; color: var(--text); }
+
+    /* ID pill */
+    .id-pill {
+      font-size: .7rem; font-family: monospace; background: var(--bg);
+      border: 1px solid var(--border); border-radius: 4px;
+      padding: 2px 6px; color: var(--muted); word-break: break-all;
+    }
+
+    /* ── Profile dropdown ──────────────────────────────────────── */
+    .profile-wrap { position: relative; }
+    .profile-avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--brand), #7c3aed);
+      color: #fff; font-weight: 700; font-size: .9rem;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; border: 2px solid rgba(255,255,255,.2);
+      transition: border-color var(--transition);
+      user-select: none;
+    }
+    .profile-avatar:hover { border-color: var(--brand); }
+    .profile-dropdown {
+      display: none; position: absolute; top: 48px; right: 0;
+      background: #242424; border: 1px solid #333;
+      border-radius: 12px; min-width: 220px;
+      box-shadow: 0 12px 40px rgba(0,0,0,.45);
+      z-index: 300; overflow: hidden;
+    }
+    .profile-dropdown.open { display: block; }
+    .profile-dropdown-head {
+      padding: 16px 18px 12px;
+      border-bottom: 1px solid #333;
+    }
+    .profile-dropdown-head .pd-name { font-weight: 700; color: #fff; font-size: .95rem; }
+    .profile-dropdown-head .pd-email { font-size: .78rem; color: #999; margin-top: 2px; }
+    .pd-balance-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 10px; padding-top: 10px; border-top: 1px solid #333;
+    }
+    .pd-balance-label { font-size: .72rem; color: #666; text-transform: uppercase; letter-spacing: .05em; }
+    .pd-balance-amount { font-size: 1rem; font-weight: 800; color: #4ade80; }
+    .pd-add-funds {
+      font-size: .72rem; color: var(--brand); border: 1px solid var(--brand);
+      background: none; border-radius: 5px; padding: 3px 10px;
+      cursor: pointer; font-family: inherit; transition: background .15s;
+    }
+    .pd-add-funds:hover { background: rgba(240,85,55,.12); }
+    .profile-dropdown-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 18px; font-size: .88rem; color: #ccc;
+      cursor: pointer; transition: background var(--transition);
+      border: none; background: none; width: 100%; text-align: left;
+    }
+    .profile-dropdown-item:hover { background: rgba(255,255,255,.06); color: #fff; }
+    .profile-dropdown-item.danger { color: #f87171; }
+    .profile-dropdown-item.danger:hover { background: rgba(248,113,113,.1); }
+      border: 1px solid var(--border); border-radius: 4px;
+      padding: 2px 6px; color: var(--muted); word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Toast container ──────────────────────────────────────────── -->
+<div id="toastContainer"></div>
+
+<!-- ── Header ───────────────────────────────────────────────────── -->
+<header>
+  <div class="header-inner">
+    <a class="logo" onclick="navigate('events')">Event<span>.io</span></a>
+    <nav>
+      <button class="nav-btn" data-page="city" onclick="navigate('city')">Find by City</button>
+      <button class="nav-btn" data-page="support" onclick="navigate('support')">Support</button>
+    </nav>
+    <div class="header-actions">
+      <div class="profile-wrap" id="profileWrap">
+        <div class="profile-avatar" id="profileAvatar" onclick="toggleProfileDropdown()">?</div>
+        <div class="profile-dropdown" id="profileDropdown">
+          <div class="profile-dropdown-head">
+            <div class="pd-name" id="pdName">—</div>
+            <div class="pd-email" id="pdEmail">—</div>
+            <div class="pd-balance-row">
+              <div>
+                <div class="pd-balance-label">Wallet Balance</div>
+                <div class="pd-balance-amount" id="pdBalance">$500.00</div>
+              </div>
+              <button class="pd-add-funds" onclick="addFunds()">+ Add Funds</button>
+            </div>
+          </div>
+          <button class="profile-dropdown-item" onclick="navigate('account');closeProfileDropdown()">👤 &nbsp;My Profile</button>
+          <button class="profile-dropdown-item danger" onclick="signOut()">⏻ &nbsp;Sign Out</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ── Category bar ─────────────────────────────────────────── -->
+<div class="cat-bar" id="catBar">
+  <div class="cat-bar-inner">
+    <button class="cat-pill active" data-cat="" onclick="selectCategory(this, '')">All</button>
+    <button class="cat-pill" data-cat="gaming"    onclick="selectCategory(this, 'gaming')">Gaming</button>
+    <button class="cat-pill" data-cat="music"     onclick="selectCategory(this, 'music')">Music</button>
+    <button class="cat-pill" data-cat="sports"    onclick="selectCategory(this, 'sports')">Sports</button>
+    <button class="cat-pill" data-cat="tech"      onclick="selectCategory(this, 'tech')">Tech</button>
+    <button class="cat-pill" data-cat="business"  onclick="selectCategory(this, 'business')">Business</button>
+    <button class="cat-pill" data-cat="arts"      onclick="selectCategory(this, 'arts')">Arts</button>
+    <button class="cat-pill" data-cat="comedy"    onclick="selectCategory(this, 'comedy')">Comedy</button>
+    <button class="cat-pill" data-cat="wellness"  onclick="selectCategory(this, 'wellness')">Wellness</button>
+    <button class="cat-pill" data-cat="film"      onclick="selectCategory(this, 'film')">Film</button>
+    <button class="cat-pill" data-cat="education" onclick="selectCategory(this, 'education')">Education</button>
+    <button class="cat-pill" data-cat="nightlife" onclick="selectCategory(this, 'nightlife')">Nightlife</button>
+    <button class="cat-pill" data-cat="food"      onclick="selectCategory(this, 'food')">Food</button>
+  </div>
+</div>
+
+  <!-- ── BROWSE EVENTS PAGE ──────────────────────────────────────── -->
+  <div class="page active" id="page-events">
+    <div class="hero">
+      <h1>Discover &amp; Book Events</h1>
+      <p>Browse upcoming events, grab a ticket before they sell out, and manage your registrations — all in one place.</p>
+      <button class="btn btn-host-hero" onclick="navigate('create')">+ Host an Event</button>
+    </div>
+
+    <div class="stats-strip" id="statsStrip">
+      <div class="stat-box"><div class="num" id="statTotal">—</div><div class="lbl">Total Events</div></div>
+      <div class="stat-box"><div class="num" id="statAvail">—</div><div class="lbl">With Open Spots</div></div>
+      <div class="stat-box"><div class="num" id="statFull">—</div><div class="lbl">Sold Out</div></div>
+    </div>
+
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search events by title or description…" oninput="filterEvents()" />
+      <button class="btn btn-secondary" onclick="filterEvents()">Search</button>
+    </div>
+
+    <div id="eventsContainer"><div class="spinner"></div></div>
+  </div>
+
+  <!-- ── CREATE EVENT PAGE ──────────────────────────────────────── -->
+  <div class="page" id="page-create">
+    <div class="create-wrap">
+      <div class="create-card">
+        <div class="create-header">
+          <h1>Host an Event</h1>
+          <p>Fill in the details below and publish your event instantly.</p>
+        </div>
+        <form id="createEventForm" onsubmit="submitCreateEvent(event)">
+          <div class="form-group">
+            <label>Event Title *</label>
+            <input type="text" id="evTitle" placeholder="e.g. Go Developer Meetup" required />
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea id="evDesc" placeholder="What is this event about?"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Category *</label>
+              <select id="evCategory" required>
+                <option value="" disabled selected>Select a category</option>
+                <option value="gaming">Gaming</option>
+                <option value="music">Music</option>
+                <option value="sports">Sports</option>
+                <option value="tech">Tech</option>
+                <option value="business">Business</option>
+                <option value="arts">Arts</option>
+                <option value="comedy">Comedy</option>
+                <option value="wellness">Wellness</option>
+                <option value="film">Film</option>
+                <option value="education">Education</option>
+                <option value="nightlife">Nightlife</option>
+                <option value="food">Food</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>City *</label>
+              <input type="text" id="evCity" placeholder="e.g. New York, Mumbai" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Cover Image</label>
+            <div class="cover-upload-area" id="coverUploadArea" onclick="document.getElementById('evCoverFile').click()">
+              <img id="coverPreview" src="" alt="" style="display:none" />
+              <div class="cover-upload-placeholder" id="coverPlaceholder">
+                <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M4 16l4-4 4 4 4-6 4 6"/><rect x="3" y="3" width="18" height="18" rx="3"/></svg>
+                <span>Click to upload a cover photo</span>
+                <span style="font-size:.75rem;color:var(--muted)">JPEG, PNG, WEBP &mdash; max 2 MB</span>
+              </div>
+            </div>
+            <input type="file" id="evCoverFile" accept="image/*" style="display:none" onchange="handleCoverUpload(this)" />
+            <button type="button" class="cover-clear-btn" id="coverClearBtn" style="display:none" onclick="clearCover()">✕ Remove image</button>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Starts At *</label>
+              <input type="datetime-local" id="evStart" required />
+            </div>
+            <div class="form-group">
+              <label>Ends At *</label>
+              <input type="datetime-local" id="evEnd" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Ticket Price ($)</label>
+            <input type="number" id="evPrice" placeholder="0 for free" min="0" step="0.01" value="0" />
+            <div class="form-hint">Set to 0 for a free event.</div>
+          </div>
+          <div class="form-group">
+            <label>Capacity *</label>
+            <input type="number" id="evCapacity" placeholder="e.g. 50" min="1" required />
+            <div class="form-hint">Maximum number of registrations allowed.</div>
+          </div>
+          <div class="form-group">
+            <label>Organizer ID *</label>
+            <input type="text" id="evOrganizer" placeholder="MongoDB ObjectID hex" required />
+            <div class="form-hint">Need an ID? Go to <a href="#" onclick="navigate('account');return false">Account</a> and create a user first.</div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:8px">
+            <button type="submit" class="btn btn-primary" style="flex:1">Publish Event</button>
+            <button type="button" class="btn btn-secondary" onclick="resetCreateForm()">Reset</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ACCOUNT PAGE ──────────────────────────────────────────── -->
+  <div class="page" id="page-account">
+    <div class="section-head">
+      <div><h1>Account</h1><p>Manage your profile and view your registrations.</p></div>
+    </div>
+    <div class="two-col">
+      <!-- Create / switch user -->
+      <div class="form-card" style="max-width:100%">
+        <h2>👤 Create User</h2>
+        <form id="createUserForm" onsubmit="submitCreateUser(event)">
+          <div class="form-group">
+            <label>Full Name *</label>
+            <input type="text" id="uName" placeholder="e.g. Alice Nguyen" required />
+          </div>
+          <div class="form-group">
+            <label>Email *</label>
+            <input type="email" id="uEmail" placeholder="alice@example.com" required />
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm">Create &amp; Sign In</button>
+        </form>
+
+        <hr style="margin: 22px 0; border: none; border-top: 1px solid var(--border);">
+
+        <h2 style="font-size:1rem;margin-bottom:14px">🔑 Use Existing User ID</h2>
+        <div class="form-group" style="margin-bottom:10px">
+          <input type="text" id="existingUID" placeholder="Paste ObjectID hex…" />
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="useExistingUser()">Load User</button>
+
+        <div id="activeUserCard" style="margin-top:20px;display:none">
+          <div style="background:var(--bg);border-radius:8px;padding:14px;border:1px solid var(--border)">
+            <div style="font-size:.78rem;color:var(--muted);margin-bottom:4px">ACTIVE USER</div>
+            <div style="font-weight:700" id="activeUserName">—</div>
+            <div style="font-size:.82rem;color:var(--muted)" id="activeUserEmail">—</div>
+            <div style="margin-top:8px"><span class="id-pill" id="activeUserID">—</span></div>
+            <button class="btn btn-secondary btn-sm" style="margin-top:10px" onclick="copyUID()">Copy ID</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- My registrations -->
+      <div class="form-card" style="max-width:100%">
+        <h2>🎟 My Registrations</h2>
+        <div id="myRegsContainer">
+          <div class="empty-state" style="padding:30px 10px">
+            <div class="icon">🎫</div>
+            <h3>No registrations yet</h3>
+            <p>Create a user or load an existing one, then register for events.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FIND BY CITY PAGE ──────────────────────────────────────── -->
+  <div class="page" id="page-city">
+    <div class="city-hero">
+      <h1>📍 Find Events by City</h1>
+      <p>Type a city name to discover events happening near you.</p>
+    </div>
+    <div class="city-search-wrap">
+      <input type="text" id="cityInput" placeholder="e.g. New York, Mumbai, London…" oninput="citySearch()" />
+      <button class="btn btn-primary" onclick="citySearch()">Search</button>
+    </div>
+    <div id="cityResults"></div>
+  </div>
+
+  <!-- ── CUSTOMER SUPPORT PAGE ───────────────────────────────────── -->
+  <div class="page" id="page-support">
+    <div class="support-hero">
+      <h1>💬 Customer Support</h1>
+      <p>Have a question? Browse our FAQs or reach out directly.</p>
+    </div>
+
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">How do I register for an event? <span class="faq-icon">▼</span></button>
+        <div class="faq-a">Browse the Events page, click on any event card to open the detail modal, then click <strong>Register Now</strong>. You must be signed in to register.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">How do I cancel my registration? <span class="faq-icon">▼</span></button>
+        <div class="faq-a">Go to <strong>My Profile → My Registrations</strong>. Find the event and click <strong>Cancel Registration</strong>. Cancellations are free up to 24 hours before the event starts.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Can I host my own event? <span class="faq-icon">▼</span></button>
+        <div class="faq-a">Yes! Sign in, then use the <strong>Create Event</strong> section in your profile. Fill in the event title, description, capacity, and dates — your event goes live instantly.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">What payment methods are accepted? <span class="faq-icon">▼</span></button>
+        <div class="faq-a">Event.io supports major credit/debit cards (Visa, Mastercard, Amex), UPI, and net banking. Payments are processed securely and tickets are delivered to your registered email.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">I didn't receive my ticket confirmation. What should I do? <span class="faq-icon">▼</span></button>
+        <div class="faq-a">Check your spam/junk folder first. If it's not there, contact us at <strong>support@event.io</strong> with your registration ID and we'll resend it within 2 hours.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">How do I get a refund? <span class="faq-icon">▼</span></button>
+        <div class="faq-a">Refunds are processed within 5–7 business days after a successful cancellation. If you haven't received your refund, email <strong>billing@event.io</strong> with your order details.</div>
+      </div>
+    </div>
+
+    <div class="support-contact">
+      <div class="support-contact-item">
+        <div class="support-contact-icon">📧</div>
+        <div>
+          <div class="support-contact-label">Email Support</div>
+          <div class="support-contact-value">support@event.io</div>
+        </div>
+      </div>
+      <div class="support-contact-item">
+        <div class="support-contact-icon">📞</div>
+        <div>
+          <div class="support-contact-label">Phone (Mon–Fri, 9am–6pm)</div>
+          <div class="support-contact-value">+1 800 555 0199</div>
+        </div>
+      </div>
+      <div class="support-contact-item">
+        <div class="support-contact-icon">🕐</div>
+        <div>
+          <div class="support-contact-label">Response Time</div>
+          <div class="support-contact-value">Under 24 hours</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ── EVENT DETAIL MODAL ─────────────────────────────────────── -->
+<div class="modal-overlay" id="eventModal">
+  <div class="modal">
+    <img class="modal-cover" id="modalCover" src="" alt="" />
+    <div class="modal-badges" id="modalBadges"></div>
+    <div class="modal-header">
+      <h2 id="modalTitle">—</h2>
+      <button class="modal-close" onclick="closeModal('eventModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-meta" id="modalMeta"></div>
+      <div class="capacity-bar-wrap" id="modalCapacityWrap"></div>
+      <div id="modalRegSection" style="margin-top:16px"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('eventModal')">Close</button>
+      <button class="btn btn-primary btn-sm" id="modalRegBtn" onclick="registerFromModal()">Register for this Event</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── REGISTRATIONS DETAIL MODAL ────────────────────────────── -->
+<div class="modal-overlay" id="regsModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Registered Users</h2>
+      <button class="modal-close" onclick="closeModal('regsModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="regsList"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('regsModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   State
+   ═══════════════════════════════════════════════════════════════ */
+const state = {
+  events: [],
+  currentEventID: null,
+  category: '',
+  pendingCover: null,
+  balance: parseFloat(localStorage.getItem('eventhub_balance') || '500'),
+  user: JSON.parse(localStorage.getItem('eventhub_user') || 'null'),
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   API helpers
+   ═══════════════════════════════════════════════════════════════ */
+const API = '/api';
+
+async function apiFetch(path, opts = {}) {
+  const res = await fetch(API + path, {
+    headers: { 'Content-Type': 'application/json' },
+    ...opts,
+  });
+  const text = await res.text();
+  let body;
+  try { body = JSON.parse(text); } catch { body = text; }
+  if (!res.ok) throw new Error(typeof body === 'string' ? body : JSON.stringify(body));
+  return body;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Toast
+   ═══════════════════════════════════════════════════════════════ */
+function toast(msg, type = 'info') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Navigation
+   ═══════════════════════════════════════════════════════════════ */
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const activeBtn = document.querySelector(`.nav-btn[data-page="${page}"]`);
+  if (activeBtn) activeBtn.classList.add('active');
+  closeProfileDropdown();
+  if (page === 'events') loadEvents();
+  if (page === 'account') renderActiveUser();
+  if (page === 'city') {
+    if (!state.events.length) loadEvents().then(() => citySearch()); else citySearch();
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   City search
+   ═══════════════════════════════════════════════════════════════ */
+function citySearch() {
+  const q = (document.getElementById('cityInput').value || '').trim().toLowerCase();
+  const container = document.getElementById('cityResults');
+  if (!q) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">🗺️</div><h3>Enter a city name above</h3><p>We'll find events that match your location.</p></div>`;
+    return;
+  }
+  const hits = state.events.filter(ev =>
+    (ev.title||'').toLowerCase().includes(q) ||
+    (ev.description||'').toLowerCase().includes(q)
+  );
+  if (!hits.length) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">📭</div><h3>No events found in "${esc(q)}"</h3><p>Try a different city or check the spelling.</p></div>`;
+    return;
+  }
+  container.innerHTML = `<div class="events-grid">${hits.map((ev,i) => renderEventCard(ev,i)).join('')}</div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FAQ toggle
+   ═══════════════════════════════════════════════════════════════ */
+function toggleFaq(btn) {
+  const answer = btn.nextElementSibling;
+  const isOpen = btn.classList.contains('open');
+  // close all
+  document.querySelectorAll('.faq-q.open').forEach(b => {
+    b.classList.remove('open'); b.nextElementSibling.classList.remove('open');
+  });
+  if (!isOpen) { btn.classList.add('open'); answer.classList.add('open'); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Events page
+   ═══════════════════════════════════════════════════════════════ */
+/* Category → Unsplash search keyword for cover photos */
+const CAT_PHOTO = {
+  gaming: 'gaming', music: 'concert', sports: 'sport', tech: 'technology',
+  business: 'conference', arts: 'art', comedy: 'comedy stage', wellness: 'yoga meditation',
+  film: 'cinema', education: 'classroom', nightlife: 'night party', food: 'food restaurant',
+};
+
+function getCoverUrl(ev) {
+  // Use embedded cover image if the creator uploaded one
+  const coverMatch = (ev.description || '').match(/\[Cover:\s*([^\]]+)\]/);
+  if (coverMatch) return coverMatch[1].trim();
+  // Fall back to stable picsum seed
+  const seed = (ev.id || ev.title || 'event').replace(/[^a-zA-Z0-9]/g, '');
+  return `https://picsum.photos/seed/${seed}/800/400`;
+}
+
+function cleanDesc(desc) {
+  return (desc || '')
+    .replace(/\[Category:[^\]]*\]/gi, '')
+    .replace(/\[City:[^\]]*\]/gi, '')
+    .replace(/\[Price:[^\]]*\]/gi, '')
+    .replace(/\[Cover:[^\]]*\]/gi, '')
+    .trim();
+}
+
+function getEventPrice(ev) {
+  const m = (ev.description || '').match(/\[Price:\s*([\d.]+)\]/i);
+  return m ? parseFloat(m[1]) : 0;
+}
+
+function handleCoverUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) {
+    toast('Image is too large. Max size is 2 MB.', 'error');
+    input.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    state.pendingCover = e.target.result;          // base64 data URL
+    const preview = document.getElementById('coverPreview');
+    preview.src = e.target.result;
+    preview.style.display = 'block';
+    document.getElementById('coverPlaceholder').style.display = 'none';
+    document.getElementById('coverClearBtn').style.display = 'inline';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearCover() {
+  state.pendingCover = null;
+  const preview = document.getElementById('coverPreview');
+  if (preview) { preview.src = ''; preview.style.display = 'none'; }
+  const ph = document.getElementById('coverPlaceholder');
+  if (ph) ph.style.display = 'flex';
+  const btn = document.getElementById('coverClearBtn');
+  if (btn) btn.style.display = 'none';
+  const fi = document.getElementById('evCoverFile');
+  if (fi) fi.value = '';
+}
+
+const BANNERS = ['', 'alt1', 'alt2', 'alt3', 'alt4'];
+
+function pct(sold, cap) { return cap > 0 ? Math.round((sold / cap) * 100) : 0; }
+
+function fmtDate(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleString(undefined, {
+    month: 'short', day: 'numeric', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  });
+}
+
+function capacityBadge(sold, cap) {
+  const p = pct(sold, cap);
+  if (p >= 100) return '<span class="badge badge-red">Sold Out</span>';
+  if (p >= 80)  return '<span class="badge badge-yellow">Almost Full</span>';
+  return `<span class="badge badge-green">${cap - sold} spots left</span>`;
+}
+
+function renderEventCard(ev, idx) {
+  const p = pct(ev.tickets_sold, ev.capacity);
+  const fillClass = p >= 100 ? 'full' : p >= 80 ? 'warn' : '';
+  const coverUrl = getCoverUrl(ev);
+  const desc = cleanDesc(ev.description) || 'No description provided.';
+  return `
+    <div class="event-card" onclick="openEventModal('${ev.id}')">
+      <div class="event-card-banner">
+        <img src="${coverUrl}" alt="" loading="lazy" onerror="this.style.display='none'" />
+        <div class="event-card-banner-overlay"></div>
+        <span class="event-card-date">${fmtDate(ev.starts_at)}</span>
+      </div>
+      <div class="event-card-body">
+        <div class="event-card-title">${esc(ev.title)}</div>
+        <div class="event-card-desc">${esc(desc)}</div>
+        <div class="capacity-bar-wrap">
+          <div class="capacity-label">
+            <span>${ev.tickets_sold} / ${ev.capacity} registered</span>
+            <span>${p}%</span>
+          </div>
+          <div class="capacity-bar">
+            <div class="capacity-bar-fill ${fillClass}" style="width:${Math.min(p,100)}%"></div>
+          </div>
+        </div>
+        ${capacityBadge(ev.tickets_sold, ev.capacity)}
+      </div>
+    </div>`;
+}
+
+async function loadEvents() {
+  const container = document.getElementById('eventsContainer');
+  container.innerHTML = '<div class="spinner"></div>';
+  try {
+    const events = await apiFetch('/events');
+    state.events = events || [];
+    updateStats(state.events);
+    renderEvents(state.events);
+  } catch (e) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><h3>Failed to load events</h3><p>${esc(e.message)}</p></div>`;
+  }
+}
+
+function renderEvents(events) {
+  const container = document.getElementById('eventsContainer');
+  if (!events || events.length === 0) {
+    container.innerHTML = `<div class="empty-state">
+      <div class="icon">📭</div>
+      <h3>No events yet</h3>
+      <p>Be the first to create an event!</p>
+    </div>`;
+    return;
+  }
+  container.innerHTML = `<div class="events-grid">${events.map((e, i) => renderEventCard(e, i)).join('')}</div>`;
+}
+
+function updateStats(events) {
+  const total = events.length;
+  const full  = events.filter(e => e.tickets_sold >= e.capacity).length;
+  const avail = total - full;
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statAvail').textContent = avail;
+  document.getElementById('statFull').textContent  = full;
+}
+
+/* Category keywords map */
+const CAT_KEYWORDS = {
+  gaming:    ['game','gaming','esport','esports','tournament','lan','console','pc gaming'],
+  music:     ['music','concert','band','festival','live','dj','song','acoustic','gig'],
+  sports:    ['sport','sports','football','cricket','basketball','tennis','run','marathon','match','league','fitness','gym','race','cycling','swim'],
+  tech:      ['tech','technology','ai','developer','coding','hackathon','startup','product','software','hardware','data','cloud','web','mobile','iot'],
+  business:  ['business','conference','meetup','networking','entrepreneur','career','professional','workshop','finance','investment','leadership'],
+  arts:      ['art','arts','craft','creative','design','paint','gallery','exhibit','sculpture','photography'],
+  comedy:    ['comedy','stand-up','standup','laugh','improv','humor','comedian','open mic'],
+  wellness:  ['wellness','yoga','meditation','mental health','health','mindfulness','spa','therapy','healing','retreat','self-care'],
+  film:      ['film','cinema','movie','screening','documentary','short film','animation','filmmaking'],
+  education: ['education','learning','seminar','lecture','training','course','skill','workshop','class','tutori','bootcamp'],
+  nightlife: ['night','party','club','bar','lounge','rave','dance','after','social'],
+  food:      ['food','eat','restaurant','cook','cooking','taste','drink','wine','beer','cuisine','chef'],
+};
+
+function selectCategory(el, cat) {
+  document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  state.category = cat;
+  filterEvents();
+}
+
+function filterEvents() {
+  const q   = (document.getElementById('searchInput').value || '').toLowerCase();
+  const cat = state.category;
+  let results = state.events;
+  if (q) {
+    results = results.filter(e =>
+      e.title.toLowerCase().includes(q) ||
+      (e.description || '').toLowerCase().includes(q)
+    );
+  }
+  if (cat) {
+    const kws = CAT_KEYWORDS[cat] || [cat];
+    results = results.filter(e => {
+      const haystack = (e.title + ' ' + (e.description || '')).toLowerCase();
+      return haystack.includes(`[category: ${cat}]`) || kws.some(k => haystack.includes(k));
+    });
+  }
+  renderEvents(results);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Event Detail Modal
+   ═══════════════════════════════════════════════════════════════ */
+async function openEventModal(id) {
+  state.currentEventID = id;
+  const ev = state.events.find(e => e.id === id);
+  if (!ev) return;
+
+  const p = pct(ev.tickets_sold, ev.capacity);
+  const fillClass = p >= 100 ? 'full' : p >= 80 ? 'warn' : '';
+  const isFull = ev.tickets_sold >= ev.capacity;
+
+  document.getElementById('modalTitle').textContent = ev.title;
+
+  // Cover photo
+  document.getElementById('modalCover').src = getCoverUrl(ev);
+
+  // Category & city badges
+  const catM   = (ev.description||'').match(/\[Category:\s*(\w+)\]/i);
+  const cityM  = (ev.description||'').match(/\[City:\s*([^\]]+)\]/i);
+  const price  = getEventPrice(ev);
+  const badges = [];
+  if (catM)  badges.push(`<span class="modal-badge">${esc(catM[1])}</span>`);
+  if (cityM) badges.push(`<span class="modal-badge city">📍 ${esc(cityM[1].trim())}</span>`);
+  if (price > 0) badges.push(`<span class="modal-badge price">$${price.toFixed(2)}</span>`);
+  else           badges.push(`<span class="modal-badge free">Free</span>`);
+  document.getElementById('modalBadges').innerHTML = badges.join('');
+
+  document.getElementById('modalMeta').innerHTML = `
+    <div class="modal-meta-row"><span class="key">📅 Starts</span><span class="val">${fmtDate(ev.starts_at)}</span></div>
+    <div class="modal-meta-row"><span class="key">🔚 Ends</span><span class="val">${fmtDate(ev.ends_at)}</span></div>
+    <div class="modal-meta-row"><span class="key">📝 Desc</span><span class="val">${esc(cleanDesc(ev.description) || '—')}</span></div>
+    <div class="modal-meta-row"><span class="key">💵 Price</span><span class="val" style="font-weight:700;color:${price > 0 ? '#4ade80' : 'var(--muted)'}"> ${price > 0 ? '$' + price.toFixed(2) : 'Free'}</span></div>
+    <div class="modal-meta-row"><span class="key">🪪 Event ID</span><span class="val id-pill">${ev.id}</span></div>
+  `;
+  document.getElementById('modalCapacityWrap').innerHTML = `
+    <div class="capacity-label">
+      <span>${ev.tickets_sold} of ${ev.capacity} registered</span>
+      <span>${capacityBadge(ev.tickets_sold, ev.capacity)}</span>
+    </div>
+    <div class="capacity-bar">
+      <div class="capacity-bar-fill ${fillClass}" style="width:${Math.min(p,100)}%"></div>
+    </div>
+  `;
+
+  const regBtn = document.getElementById('modalRegBtn');
+  if (isFull) {
+    regBtn.disabled = true;
+    regBtn.textContent = 'Sold Out';
+  } else {
+    regBtn.disabled = false;
+    regBtn.textContent = price > 0 ? `Register — $${price.toFixed(2)}` : 'Register (Free)';
+  }
+
+  document.getElementById('modalRegSection').innerHTML = `
+    <button class="btn btn-secondary btn-sm" onclick="openRegsModal('${id}')">View registered users</button>`;
+
+  openModal('eventModal');
+}
+
+async function registerFromModal() {
+  if (!state.user) {
+    toast('Please create or load a user in the Account tab first.', 'error');
+    return;
+  }
+  const btn = document.getElementById('modalRegBtn');
+  btn.disabled = true;
+  btn.textContent = 'Registering…';
+  try {
+    await apiFetch(`/events/${state.currentEventID}/registrations`, {
+      method: 'POST',
+      body: JSON.stringify({ user_id: state.user.id }),
+    });
+    toast('Registration successful! 🎉', 'success');
+    closeModal('eventModal');
+    await loadEvents();
+  } catch (e) {
+    toast(`Registration failed: ${e.message}`, 'error');
+    btn.disabled = false;
+    btn.textContent = '🎟 Register for this Event';
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Registrations list modal
+   ═══════════════════════════════════════════════════════════════ */
+async function openRegsModal(eventID) {
+  document.getElementById('regsList').innerHTML = '<div class="spinner"></div>';
+  openModal('regsModal');
+  try {
+    const ids = await apiFetch(`/events/${eventID}/registrations`);
+    const list = ids || [];
+    if (list.length === 0) {
+      document.getElementById('regsList').innerHTML = `
+        <div class="empty-state" style="padding:30px 0">
+          <div class="icon">👥</div><h3>No registrations yet</h3>
+        </div>`;
+      return;
+    }
+    document.getElementById('regsList').innerHTML = `
+      <p style="font-size:.82rem;color:var(--muted);margin-bottom:12px">${list.length} user ID(s) registered</p>
+      <div class="reg-user-list">
+        ${list.map((uid, i) => `
+          <div class="reg-user-item">
+            <div class="avatar">${String(i+1).padStart(2,'0')}</div>
+            <span class="id-pill" style="font-size:.72rem">${uid}</span>
+          </div>`).join('')}
+      </div>`;
+  } catch (e) {
+    document.getElementById('regsList').innerHTML = `<p style="color:var(--danger)">${esc(e.message)}</p>`;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Create Event
+   ═══════════════════════════════════════════════════════════════ */
+async function submitCreateEvent(e) {
+  e.preventDefault();
+  const btn = e.target.querySelector('[type=submit]');
+  btn.disabled = true; btn.textContent = 'Publishing…';
+
+  const start = new Date(document.getElementById('evStart').value);
+  const end   = new Date(document.getElementById('evEnd').value);
+  if (end <= start) {
+    toast('End time must be after start time.', 'error');
+    btn.disabled = false; btn.textContent = 'Publish Event';
+    return;
+  }
+
+  const category = document.getElementById('evCategory').value.trim();
+  const city     = document.getElementById('evCity').value.trim();
+  const price    = parseFloat(document.getElementById('evPrice').value) || 0;
+  const baseDesc = document.getElementById('evDesc').value.trim();
+  const coverTag = state.pendingCover ? `[Cover: ${state.pendingCover}]` : '';
+  const description = `${baseDesc}${baseDesc ? '\n\n' : ''}[Category: ${category}] [City: ${city}] [Price: ${price.toFixed(2)}]${coverTag ? ' ' + coverTag : ''}`;
+
+  const body = {
+    organizer_id: document.getElementById('evOrganizer').value.trim(),
+    title:        document.getElementById('evTitle').value.trim(),
+    description,
+    capacity:     parseInt(document.getElementById('evCapacity').value),
+    starts_at:    start.toISOString(),
+    ends_at:      end.toISOString(),
+  };
+
+  try {
+    const ev = await apiFetch('/events', { method: 'POST', body: JSON.stringify(body) });
+    toast(`Event "${ev.title}" created!`, 'success');
+    state.pendingCover = null;
+    resetCreateForm();
+    navigate('events');
+  } catch (err) {
+    toast(`Failed to create event: ${err.message}`, 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Publish Event';
+  }
+}
+
+function resetCreateForm() {
+  document.getElementById('createEventForm').reset();
+  if (state.user) document.getElementById('evOrganizer').value = state.user.id;
+  clearCover();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Account
+   ═══════════════════════════════════════════════════════════════ */
+async function submitCreateUser(e) {
+  e.preventDefault();
+  const btn = e.target.querySelector('[type=submit]');
+  btn.disabled = true;
+  try {
+    const user = await apiFetch('/users', {
+      method: 'POST',
+      body: JSON.stringify({
+        name:  document.getElementById('uName').value.trim(),
+        email: document.getElementById('uEmail').value.trim(),
+      }),
+    });
+    setActiveUser(user);
+    document.getElementById('createUserForm').reset();
+    toast(`Welcome, ${user.name}! 👋`, 'success');
+  } catch (err) {
+    toast(`Failed: ${err.message}`, 'error');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function useExistingUser() {
+  const id = document.getElementById('existingUID').value.trim();
+  if (!/^[0-9a-fA-F]{24}$/.test(id)) {
+    toast('Please enter a valid 24-character hex ObjectID.', 'error');
+    return;
+  }
+  // We only have the ID, store minimal info
+  setActiveUser({ id, name: '(loaded by ID)', email: '' });
+  toast('User loaded. You can now register for events.', 'info');
+}
+
+function setActiveUser(user) {
+  state.user = user;
+  localStorage.setItem('eventhub_user', JSON.stringify(user));
+  renderActiveUser();
+  updateProfileDropdown();
+  // Pre-fill organizer field
+  const orgField = document.getElementById('evOrganizer');
+  if (orgField) orgField.value = user.id;
+}
+
+function renderActiveUser() {
+  if (!state.user) return;
+  const card = document.getElementById('activeUserCard');
+  card.style.display = 'block';
+  document.getElementById('activeUserName').textContent  = state.user.name  || '—';
+  document.getElementById('activeUserEmail').textContent = state.user.email || '—';
+  document.getElementById('activeUserID').textContent    = state.user.id;
+  loadMyRegistrations();
+}
+
+function updateProfileDropdown() {
+  const u = state.user;
+  const initials = u
+    ? (u.name || u.email || '?').split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase()
+    : '?';
+  document.getElementById('profileAvatar').textContent = initials;
+  document.getElementById('pdName').textContent  = u ? (u.name  || '—') : '—';
+  document.getElementById('pdEmail').textContent = u ? (u.email || '—') : '—';
+  document.getElementById('pdBalance').textContent = `$${state.balance.toFixed(2)}`;
+}
+
+function addFunds() {
+  const amt = parseFloat(prompt('How much would you like to add? (e.g. 100)', '100'));
+  if (isNaN(amt) || amt <= 0) return;
+  state.balance = parseFloat((state.balance + amt).toFixed(2));
+  localStorage.setItem('eventhub_balance', String(state.balance));
+  updateProfileDropdown();
+  toast(`$${amt.toFixed(2)} added to your wallet! New balance: $${state.balance.toFixed(2)}`, 'success');
+}
+
+function toggleProfileDropdown() {
+  document.getElementById('profileDropdown').classList.toggle('open');
+}
+
+function closeProfileDropdown() {
+  document.getElementById('profileDropdown').classList.remove('open');
+}
+
+function copyUID() {
+  if (!state.user) return;
+  navigator.clipboard.writeText(state.user.id).then(() => toast('User ID copied!', 'info'));
+}
+
+async function loadMyRegistrations() {
+  if (!state.user) return;
+  const container = document.getElementById('myRegsContainer');
+  // Build a list of events this user is registered for by checking registration_ids
+  const myEvents = state.events.filter(ev =>
+    (ev.registration_ids || []).includes(state.user.id)
+  );
+  if (state.events.length === 0) {
+    try {
+      const all = await apiFetch('/events');
+      state.events = all || [];
+    } catch { /* ignore */ }
+  }
+  if (myEvents.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state" style="padding:30px 10px">
+        <div class="icon">🎫</div>
+        <h3>No registrations found</h3>
+        <p>Browse events and register to see them here.</p>
+      </div>`;
+    return;
+  }
+  container.innerHTML = myEvents.map(ev => `
+    <div class="reg-item" onclick="openEventModal('${ev.id}')" style="cursor:pointer">
+      <div class="event-name">${esc(ev.title)}</div>
+      <div class="reg-date">${fmtDate(ev.starts_at)}</div>
+    </div>`).join('');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Modal helpers
+   ═══════════════════════════════════════════════════════════════ */
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+// Close dropdown when clicking outside
+document.addEventListener('click', e => {
+  const wrap = document.getElementById('profileWrap');
+  if (wrap && !wrap.contains(e.target)) closeProfileDropdown();
+});
+
+// Close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) closeModal(overlay.id);
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   Utilities
+   ═══════════════════════════════════════════════════════════════ */
+function esc(s) {
+  return String(s ?? '')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Auth guard
+   ═══════════════════════════════════════════════════════════════ */
+function signOut() {
+  localStorage.removeItem('eventhub_user');
+  window.location.href = '/login.html';
+}
+
+// Redirect to login if no session
+(function() {
+  const u = localStorage.getItem('eventhub_user');
+  if (!u) { window.location.href = '/login.html'; }
+  else {
+    try { const p = JSON.parse(u); if (!p || (!p.id && !p.name)) window.location.href = '/login.html'; }
+    catch { window.location.href = '/login.html'; }
+  }
+})();
+
+/* ═══════════════════════════════════════════════════════════════
+   Boot
+   ═══════════════════════════════════════════════════════════════ */
+/* Boot */
+updateProfileDropdown();
+if (state.user) {
+  document.getElementById('activeUserCard').style.display = 'block';
+  document.getElementById('activeUserName').textContent  = state.user.name  || '—';
+  document.getElementById('activeUserEmail').textContent = state.user.email || '—';
+  document.getElementById('activeUserID').textContent    = state.user.id;
+  const orgField = document.getElementById('evOrganizer');
+  if (orgField) orgField.value = state.user.id;
+}
+loadEvents();
+</script>
+</body>
+</html>
