@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Event.io — Event Registration &amp; Ticketing</title>
   <style>
-    /* ── Reset & Variables ──────────────────────────────────────── */
+    
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
@@ -31,7 +31,7 @@
       min-height: 100vh;
     }
 
-    /* ── Header ─────────────────────────────────────────────────── */
+    
     header {
       position: sticky; top: 0; z-index: 100;
       background: #1a1a1a;
@@ -72,12 +72,12 @@
     }
     #userBadge span { color: var(--brand); font-weight: 600; }
 
-    /* ── Layout ─────────────────────────────────────────────────── */
+    
     main { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
     .page { display: none; }
     .page.active { display: block; }
 
-    /* ── Section titles ──────────────────────────────────────────── */
+    
     .section-head {
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 24px;
@@ -85,7 +85,7 @@
     .section-head h1 { font-size: 1.6rem; font-weight: 700; }
     .section-head p { color: var(--muted); font-size: .9rem; margin-top: 3px; }
 
-    /* ── Buttons ─────────────────────────────────────────────────── */
+    
     .btn {
       display: inline-flex; align-items: center; gap: 6px;
       padding: 9px 20px; border-radius: 8px; font-size: .9rem;
@@ -99,7 +99,7 @@
     .btn-sm { padding: 6px 14px; font-size: .82rem; }
     .btn:disabled { opacity: .5; cursor: not-allowed; }
 
-    /* ── Event Cards Grid ────────────────────────────────────────── */
+    
     .events-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -165,7 +165,7 @@
     .badge-yellow { background: #fef9c3; color: var(--warn); }
     .badge-gray   { background: #f3f4f6; color: var(--muted); }
 
-    /* ── Empty / Loading states ──────────────────────────────────── */
+    
     .empty-state {
       text-align: center; padding: 80px 20px; color: var(--muted);
     }
@@ -180,7 +180,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── Search / filter bar ─────────────────────────────────────── */
+    
     .search-bar {
       display: flex; gap: 10px; margin-bottom: 24px;
     }
@@ -191,7 +191,7 @@
     }
     .search-bar input:focus { outline: none; border-color: var(--brand); }
 
-    /* ── Forms ───────────────────────────────────────────────────── */
+    
     .form-card {
       background: var(--surface); border-radius: var(--radius);
       box-shadow: var(--shadow); border: 1px solid var(--border);
@@ -219,7 +219,7 @@
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .form-hint { font-size: .75rem; color: var(--muted); margin-top: 4px; }
 
-    /* ── Modal ───────────────────────────────────────────────────── */
+    
     .modal-overlay {
       display: none; position: fixed; inset: 0;
       background: rgba(0,0,0,.55); z-index: 200;
@@ -281,7 +281,7 @@
     .modal-meta-row .key { width: 110px; color: var(--muted); flex-shrink: 0; font-weight: 600; }
     .modal-meta-row .val { color: var(--text); }
 
-    /* ── Toast ───────────────────────────────────────────────────── */
+    
     #toastContainer {
       position: fixed; bottom: 24px; right: 24px;
       z-index: 500; display: flex; flex-direction: column; gap: 10px;
@@ -301,7 +301,7 @@
       to   { opacity: 1; transform: translateX(0); }
     }
 
-    /* ── Account page ────────────────────────────────────────────── */
+    
     .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
     @media (max-width: 720px) { .two-col { grid-template-columns: 1fr; } }
     .reg-item {
@@ -311,7 +311,7 @@
     .reg-item .event-name { font-weight: 600; font-size: .9rem; }
     .reg-item .reg-date { font-size: .78rem; color: var(--muted); margin-top: 3px; }
 
-    /* ── Registrations detail ────────────────────────────────────── */
+    
     .reg-user-list { display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow-y: auto; }
     .reg-user-item {
       display: flex; align-items: center; gap: 10px;
@@ -326,7 +326,7 @@
       flex-shrink: 0;
     }
 
-    /* ── Hero banner ─────────────────────────────────────────────── */
+    
     .hero {
       background: linear-gradient(135deg, #1a1a1a 0%, #2d1f3d 100%);
       border-radius: var(--radius); padding: 40px 40px; margin-bottom: 32px;
@@ -341,7 +341,7 @@
     .hero p { color: rgba(255,255,255,.65); font-size: .95rem; max-width: 480px; }
     .hero .hero-actions { display: flex; gap: 12px; margin-top: 20px; }
 
-    /* ── Stats strip ─────────────────────────────────────────────── */
+    
     .stats-strip {
       display: flex; gap: 16px; margin-bottom: 28px; flex-wrap: wrap;
     }
@@ -353,7 +353,7 @@
     .stat-box .num { font-size: 1.6rem; font-weight: 800; color: var(--brand); }
     .stat-box .lbl { font-size: .78rem; color: var(--muted); margin-top: 2px; }
 
-    /* ── Category bar ───────────────────────────────────────────── */
+    
     .cat-bar {
       background: #111;
       border-bottom: 1px solid #2a2a2a;
@@ -378,7 +378,7 @@
     .cat-pill:hover { color: #fff; }
     .cat-pill.active { color: var(--brand); border-bottom-color: var(--brand); }
 
-    /* ── Create event centered layout ─────────────────────────── */
+    
     .create-wrap {
       display: flex; justify-content: center;
       padding: 40px 24px;
@@ -421,7 +421,7 @@
     }
     .cover-clear-btn:hover { text-decoration: underline; }
 
-    /* ── City search page ──────────────────────────────────────── */
+    
     .city-hero { text-align: center; padding: 40px 0 28px; }
     .city-hero h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; }
     .city-hero p { color: var(--muted); font-size: .95rem; }
@@ -438,7 +438,7 @@
     #cityResults { margin-top: 0; }
     #cityEmpty { display: none; }
 
-    /* ── Support / FAQ ──────────────────────────────────────────── */
+    
     .support-hero { text-align: center; padding: 40px 0 32px; }
     .support-hero h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; }
     .support-hero p { color: var(--muted); font-size: .95rem; }
@@ -469,14 +469,14 @@
     .support-contact-label { font-size: .78rem; color: var(--muted); margin-bottom: 3px; text-transform: uppercase; letter-spacing: .05em; }
     .support-contact-value { font-weight: 600; color: var(--text); }
 
-    /* ID pill */
+    
     .id-pill {
       font-size: .7rem; font-family: monospace; background: var(--bg);
       border: 1px solid var(--border); border-radius: 4px;
       padding: 2px 6px; color: var(--muted); word-break: break-all;
     }
 
-    /* ── Profile dropdown ──────────────────────────────────────── */
+    
     .profile-wrap { position: relative; }
     .profile-avatar {
       width: 38px; height: 38px; border-radius: 50%;
@@ -527,10 +527,8 @@
 </head>
 <body>
 
-<!-- ── Toast container ──────────────────────────────────────────── -->
 <div id="toastContainer"></div>
 
-<!-- ── Header ───────────────────────────────────────────────────── -->
 <header>
   <div class="header-inner">
     <a class="logo" onclick="navigate('events')">Event<span>.io</span></a>
@@ -563,7 +561,6 @@
 
 <main>
 
-<!-- ── Category bar ─────────────────────────────────────────── -->
 <div class="cat-bar" id="catBar">
   <div class="cat-bar-inner">
     <button class="cat-pill active" data-cat="" onclick="selectCategory(this, '')">All</button>
@@ -582,7 +579,7 @@
   </div>
 </div>
 
-  <!-- ── BROWSE EVENTS PAGE ──────────────────────────────────────── -->
+  
   <div class="page active" id="page-events">
     <div class="hero">
       <h1>Discover &amp; Book Events</h1>
@@ -604,7 +601,7 @@
     <div id="eventsContainer"><div class="spinner"></div></div>
   </div>
 
-  <!-- ── CREATE EVENT PAGE ──────────────────────────────────────── -->
+  
   <div class="page" id="page-create">
     <div class="create-wrap">
       <div class="create-card">
@@ -655,212 +652,7 @@
                 <span style="font-size:.75rem;color:var(--muted)">JPEG, PNG, WEBP &mdash; max 2 MB</span>
               </div>
             </div>
-            <input type="file" id="evCoverFile" accept="image/*" style="display:none" onchange="handleCoverUpload(this)" />
-            <button type="button" class="cover-clear-btn" id="coverClearBtn" style="display:none" onclick="clearCover()">✕ Remove image</button>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Starts At *</label>
-              <input type="datetime-local" id="evStart" required />
-            </div>
-            <div class="form-group">
-              <label>Ends At *</label>
-              <input type="datetime-local" id="evEnd" required />
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Ticket Price ($)</label>
-            <input type="number" id="evPrice" placeholder="0 for free" min="0" step="0.01" value="0" />
-            <div class="form-hint">Set to 0 for a free event.</div>
-          </div>
-          <div class="form-group">
-            <label>Capacity *</label>
-            <input type="number" id="evCapacity" placeholder="e.g. 50" min="1" required />
-            <div class="form-hint">Maximum number of registrations allowed.</div>
-          </div>
-          <div class="form-group">
-            <label>Organizer ID *</label>
-            <input type="text" id="evOrganizer" placeholder="MongoDB ObjectID hex" required />
-            <div class="form-hint">Need an ID? Go to <a href="#" onclick="navigate('account');return false">Account</a> and create a user first.</div>
-          </div>
-          <div style="display:flex;gap:10px;margin-top:8px">
-            <button type="submit" class="btn btn-primary" style="flex:1">Publish Event</button>
-            <button type="button" class="btn btn-secondary" onclick="resetCreateForm()">Reset</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── ACCOUNT PAGE ──────────────────────────────────────────── -->
-  <div class="page" id="page-account">
-    <div class="section-head">
-      <div><h1>Account</h1><p>Manage your profile and view your registrations.</p></div>
-    </div>
-    <div class="two-col">
-      <!-- Create / switch user -->
-      <div class="form-card" style="max-width:100%">
-        <h2>👤 Create User</h2>
-        <form id="createUserForm" onsubmit="submitCreateUser(event)">
-          <div class="form-group">
-            <label>Full Name *</label>
-            <input type="text" id="uName" placeholder="e.g. Alice Nguyen" required />
-          </div>
-          <div class="form-group">
-            <label>Email *</label>
-            <input type="email" id="uEmail" placeholder="alice@example.com" required />
-          </div>
-          <button type="submit" class="btn btn-primary btn-sm">Create &amp; Sign In</button>
-        </form>
-
-        <hr style="margin: 22px 0; border: none; border-top: 1px solid var(--border);">
-
-        <h2 style="font-size:1rem;margin-bottom:14px">🔑 Use Existing User ID</h2>
-        <div class="form-group" style="margin-bottom:10px">
-          <input type="text" id="existingUID" placeholder="Paste ObjectID hex…" />
-        </div>
-        <button class="btn btn-secondary btn-sm" onclick="useExistingUser()">Load User</button>
-
-        <div id="activeUserCard" style="margin-top:20px;display:none">
-          <div style="background:var(--bg);border-radius:8px;padding:14px;border:1px solid var(--border)">
-            <div style="font-size:.78rem;color:var(--muted);margin-bottom:4px">ACTIVE USER</div>
-            <div style="font-weight:700" id="activeUserName">—</div>
-            <div style="font-size:.82rem;color:var(--muted)" id="activeUserEmail">—</div>
-            <div style="margin-top:8px"><span class="id-pill" id="activeUserID">—</span></div>
-            <button class="btn btn-secondary btn-sm" style="margin-top:10px" onclick="copyUID()">Copy ID</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- My registrations -->
-      <div class="form-card" style="max-width:100%">
-        <h2>🎟 My Registrations</h2>
-        <div id="myRegsContainer">
-          <div class="empty-state" style="padding:30px 10px">
-            <div class="icon">🎫</div>
-            <h3>No registrations yet</h3>
-            <p>Create a user or load an existing one, then register for events.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── FIND BY CITY PAGE ──────────────────────────────────────── -->
-  <div class="page" id="page-city">
-    <div class="city-hero">
-      <h1>📍 Find Events by City</h1>
-      <p>Type a city name to discover events happening near you.</p>
-    </div>
-    <div class="city-search-wrap">
-      <input type="text" id="cityInput" placeholder="e.g. New York, Mumbai, London…" oninput="citySearch()" />
-      <button class="btn btn-primary" onclick="citySearch()">Search</button>
-    </div>
-    <div id="cityResults"></div>
-  </div>
-
-  <!-- ── CUSTOMER SUPPORT PAGE ───────────────────────────────────── -->
-  <div class="page" id="page-support">
-    <div class="support-hero">
-      <h1>💬 Customer Support</h1>
-      <p>Have a question? Browse our FAQs or reach out directly.</p>
-    </div>
-
-    <div class="faq-list">
-      <div class="faq-item">
-        <button class="faq-q" onclick="toggleFaq(this)">How do I register for an event? <span class="faq-icon">▼</span></button>
-        <div class="faq-a">Browse the Events page, click on any event card to open the detail modal, then click <strong>Register Now</strong>. You must be signed in to register.</div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q" onclick="toggleFaq(this)">How do I cancel my registration? <span class="faq-icon">▼</span></button>
-        <div class="faq-a">Go to <strong>My Profile → My Registrations</strong>. Find the event and click <strong>Cancel Registration</strong>. Cancellations are free up to 24 hours before the event starts.</div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q" onclick="toggleFaq(this)">Can I host my own event? <span class="faq-icon">▼</span></button>
-        <div class="faq-a">Yes! Sign in, then use the <strong>Create Event</strong> section in your profile. Fill in the event title, description, capacity, and dates — your event goes live instantly.</div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q" onclick="toggleFaq(this)">What payment methods are accepted? <span class="faq-icon">▼</span></button>
-        <div class="faq-a">Event.io supports major credit/debit cards (Visa, Mastercard, Amex), UPI, and net banking. Payments are processed securely and tickets are delivered to your registered email.</div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q" onclick="toggleFaq(this)">I didn't receive my ticket confirmation. What should I do? <span class="faq-icon">▼</span></button>
-        <div class="faq-a">Check your spam/junk folder first. If it's not there, contact us at <strong>support@event.io</strong> with your registration ID and we'll resend it within 2 hours.</div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q" onclick="toggleFaq(this)">How do I get a refund? <span class="faq-icon">▼</span></button>
-        <div class="faq-a">Refunds are processed within 5–7 business days after a successful cancellation. If you haven't received your refund, email <strong>billing@event.io</strong> with your order details.</div>
-      </div>
-    </div>
-
-    <div class="support-contact">
-      <div class="support-contact-item">
-        <div class="support-contact-icon">📧</div>
-        <div>
-          <div class="support-contact-label">Email Support</div>
-          <div class="support-contact-value">support@event.io</div>
-        </div>
-      </div>
-      <div class="support-contact-item">
-        <div class="support-contact-icon">📞</div>
-        <div>
-          <div class="support-contact-label">Phone (Mon–Fri, 9am–6pm)</div>
-          <div class="support-contact-value">+1 800 555 0199</div>
-        </div>
-      </div>
-      <div class="support-contact-item">
-        <div class="support-contact-icon">🕐</div>
-        <div>
-          <div class="support-contact-label">Response Time</div>
-          <div class="support-contact-value">Under 24 hours</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</main>
-
-<!-- ── EVENT DETAIL MODAL ─────────────────────────────────────── -->
-<div class="modal-overlay" id="eventModal">
-  <div class="modal">
-    <img class="modal-cover" id="modalCover" src="" alt="" />
-    <div class="modal-badges" id="modalBadges"></div>
-    <div class="modal-header">
-      <h2 id="modalTitle">—</h2>
-      <button class="modal-close" onclick="closeModal('eventModal')">×</button>
-    </div>
-    <div class="modal-body">
-      <div class="modal-meta" id="modalMeta"></div>
-      <div class="capacity-bar-wrap" id="modalCapacityWrap"></div>
-      <div id="modalRegSection" style="margin-top:16px"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary btn-sm" onclick="closeModal('eventModal')">Close</button>
-      <button class="btn btn-primary btn-sm" id="modalRegBtn" onclick="registerFromModal()">Register for this Event</button>
-    </div>
-  </div>
-</div>
-
-<!-- ── REGISTRATIONS DETAIL MODAL ────────────────────────────── -->
-<div class="modal-overlay" id="regsModal">
-  <div class="modal">
-    <div class="modal-header">
-      <h2>Registered Users</h2>
-      <button class="modal-close" onclick="closeModal('regsModal')">×</button>
-    </div>
-    <div class="modal-body">
-      <div id="regsList"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary btn-sm" onclick="closeModal('regsModal')">Close</button>
-    </div>
-  </div>
-</div>
-
-<script>
-/* ═══════════════════════════════════════════════════════════════
-   State
-   ═══════════════════════════════════════════════════════════════ */
+            <input type="file" id="evCoverFile" accept="image
 const state = {
   events: [],
   currentEventID: null,
@@ -870,9 +662,6 @@ const state = {
   user: JSON.parse(localStorage.getItem('eventhub_user') || 'null'),
 };
 
-/* ═══════════════════════════════════════════════════════════════
-   API helpers
-   ═══════════════════════════════════════════════════════════════ */
 const API = '/api';
 
 async function apiFetch(path, opts = {}) {
@@ -887,9 +676,6 @@ async function apiFetch(path, opts = {}) {
   return body;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   Toast
-   ═══════════════════════════════════════════════════════════════ */
 function toast(msg, type = 'info') {
   const el = document.createElement('div');
   el.className = `toast ${type}`;
@@ -898,9 +684,6 @@ function toast(msg, type = 'info') {
   setTimeout(() => el.remove(), 3500);
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   Navigation
-   ═══════════════════════════════════════════════════════════════ */
 function navigate(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
@@ -915,9 +698,6 @@ function navigate(page) {
   }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   City search
-   ═══════════════════════════════════════════════════════════════ */
 function citySearch() {
   const q = (document.getElementById('cityInput').value || '').trim().toLowerCase();
   const container = document.getElementById('cityResults');
@@ -936,23 +716,15 @@ function citySearch() {
   container.innerHTML = `<div class="events-grid">${hits.map((ev,i) => renderEventCard(ev,i)).join('')}</div>`;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   FAQ toggle
-   ═══════════════════════════════════════════════════════════════ */
 function toggleFaq(btn) {
   const answer = btn.nextElementSibling;
   const isOpen = btn.classList.contains('open');
-  // close all
   document.querySelectorAll('.faq-q.open').forEach(b => {
     b.classList.remove('open'); b.nextElementSibling.classList.remove('open');
   });
   if (!isOpen) { btn.classList.add('open'); answer.classList.add('open'); }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   Events page
-   ═══════════════════════════════════════════════════════════════ */
-/* Category → Unsplash search keyword for cover photos */
 const CAT_PHOTO = {
   gaming: 'gaming', music: 'concert', sports: 'sport', tech: 'technology',
   business: 'conference', arts: 'art', comedy: 'comedy stage', wellness: 'yoga meditation',
@@ -960,10 +732,8 @@ const CAT_PHOTO = {
 };
 
 function getCoverUrl(ev) {
-  // Use embedded cover image if the creator uploaded one
   const coverMatch = (ev.description || '').match(/\[Cover:\s*([^\]]+)\]/);
   if (coverMatch) return coverMatch[1].trim();
-  // Fall back to stable picsum seed
   const seed = (ev.id || ev.title || 'event').replace(/[^a-zA-Z0-9]/g, '');
   return `https://picsum.photos/seed/${seed}/800/400`;
 }
@@ -1097,7 +867,6 @@ function updateStats(events) {
   document.getElementById('statFull').textContent  = full;
 }
 
-/* Category keywords map */
 const CAT_KEYWORDS = {
   gaming:    ['game','gaming','esport','esports','tournament','lan','console','pc gaming'],
   music:     ['music','concert','band','festival','live','dj','song','acoustic','gig'],
@@ -1140,9 +909,6 @@ function filterEvents() {
   renderEvents(results);
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   Event Detail Modal
-   ═══════════════════════════════════════════════════════════════ */
 async function openEventModal(id) {
   state.currentEventID = id;
   const ev = state.events.find(e => e.id === id);
@@ -1154,10 +920,8 @@ async function openEventModal(id) {
 
   document.getElementById('modalTitle').textContent = ev.title;
 
-  // Cover photo
   document.getElementById('modalCover').src = getCoverUrl(ev);
 
-  // Category & city badges
   const catM   = (ev.description||'').match(/\[Category:\s*(\w+)\]/i);
   const cityM  = (ev.description||'').match(/\[City:\s*([^\]]+)\]/i);
   const price  = getEventPrice(ev);
@@ -1223,9 +987,6 @@ async function registerFromModal() {
   }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   Registrations list modal
-   ═══════════════════════════════════════════════════════════════ */
 async function openRegsModal(eventID) {
   document.getElementById('regsList').innerHTML = '<div class="spinner"></div>';
   openModal('regsModal');
@@ -1253,9 +1014,6 @@ async function openRegsModal(eventID) {
   }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   Create Event
-   ═══════════════════════════════════════════════════════════════ */
 async function submitCreateEvent(e) {
   e.preventDefault();
   const btn = e.target.querySelector('[type=submit]');
@@ -1304,9 +1062,6 @@ function resetCreateForm() {
   clearCover();
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   Account
-   ═══════════════════════════════════════════════════════════════ */
 async function submitCreateUser(e) {
   e.preventDefault();
   const btn = e.target.querySelector('[type=submit]');
@@ -1335,7 +1090,6 @@ function useExistingUser() {
     toast('Please enter a valid 24-character hex ObjectID.', 'error');
     return;
   }
-  // We only have the ID, store minimal info
   setActiveUser({ id, name: '(loaded by ID)', email: '' });
   toast('User loaded. You can now register for events.', 'info');
 }
@@ -1345,7 +1099,6 @@ function setActiveUser(user) {
   localStorage.setItem('eventhub_user', JSON.stringify(user));
   renderActiveUser();
   updateProfileDropdown();
-  // Pre-fill organizer field
   const orgField = document.getElementById('evOrganizer');
   if (orgField) orgField.value = user.id;
 }
@@ -1396,7 +1149,6 @@ function copyUID() {
 async function loadMyRegistrations() {
   if (!state.user) return;
   const container = document.getElementById('myRegsContainer');
-  // Build a list of events this user is registered for by checking registration_ids
   const myEvents = state.events.filter(ev =>
     (ev.registration_ids || []).includes(state.user.id)
   );
@@ -1404,7 +1156,7 @@ async function loadMyRegistrations() {
     try {
       const all = await apiFetch('/events');
       state.events = all || [];
-    } catch { /* ignore */ }
+    } catch {  }
   }
   if (myEvents.length === 0) {
     container.innerHTML = `
@@ -1422,9 +1174,6 @@ async function loadMyRegistrations() {
     </div>`).join('');
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   Modal helpers
-   ═══════════════════════════════════════════════════════════════ */
 function openModal(id) {
   document.getElementById(id).classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -1433,37 +1182,28 @@ function closeModal(id) {
   document.getElementById(id).classList.remove('open');
   document.body.style.overflow = '';
 }
-// Close dropdown when clicking outside
 document.addEventListener('click', e => {
   const wrap = document.getElementById('profileWrap');
   if (wrap && !wrap.contains(e.target)) closeProfileDropdown();
 });
 
-// Close on overlay click
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
   overlay.addEventListener('click', e => {
     if (e.target === overlay) closeModal(overlay.id);
   });
 });
 
-/* ═══════════════════════════════════════════════════════════════
-   Utilities
-   ═══════════════════════════════════════════════════════════════ */
 function esc(s) {
   return String(s ?? '')
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
     .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   Auth guard
-   ═══════════════════════════════════════════════════════════════ */
 function signOut() {
   localStorage.removeItem('eventhub_user');
   window.location.href = '/login.html';
 }
 
-// Redirect to login if no session
 (function() {
   const u = localStorage.getItem('eventhub_user');
   if (!u) { window.location.href = '/login.html'; }
@@ -1473,10 +1213,6 @@ function signOut() {
   }
 })();
 
-/* ═══════════════════════════════════════════════════════════════
-   Boot
-   ═══════════════════════════════════════════════════════════════ */
-/* Boot */
 updateProfileDropdown();
 if (state.user) {
   document.getElementById('activeUserCard').style.display = 'block';
